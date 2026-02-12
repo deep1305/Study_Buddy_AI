@@ -1,0 +1,38 @@
+2026-02-11 22:54:19,500 - INFO - QuestionGenerator - Generating question (attempt 1/3) topic='on transformers movie franchise', difficulty='medium'
+2026-02-11 22:54:41,077 - INFO - httpx - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-11 22:56:41,108 - INFO - QuestionGenerator - Successfully parsed the question
+2026-02-11 22:56:41,108 - INFO - QuestionGenerator - Generated fill-blank: In the first Transformers movie, the secret organization hunting the Autobots is known as _____.
+2026-02-11 22:56:41,108 - INFO - QuestionGenerator - Generating question (attempt 1/3) topic='on transformers movie franchise', difficulty='medium'
+2026-02-11 22:56:41,783 - INFO - httpx - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-11 22:57:43,551 - INFO - QuestionGenerator - Successfully parsed the question
+2026-02-11 22:57:43,552 - INFO - QuestionGenerator - Generated fill-blank: The Autobots are led by the mighty warrior _____.
+2026-02-11 22:57:43,552 - INFO - QuestionGenerator - Generating question (attempt 1/3) topic='on transformers movie franchise', difficulty='medium'
+2026-02-11 22:57:44,164 - INFO - httpx - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-11 22:59:37,665 - INFO - QuestionGenerator - Successfully parsed the question
+2026-02-11 22:59:37,665 - INFO - QuestionGenerator - Generated fill-blank: The ancient alien artifact capable of creating life from nothing is known as the _____.
+2026-02-11 22:59:37,665 - INFO - QuestionGenerator - Generating question (attempt 1/3) topic='on transformers movie franchise', difficulty='medium'
+2026-02-11 22:59:38,254 - INFO - httpx - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-11 23:03:21,394 - INFO - QuestionGenerator - Successfully parsed the question
+2026-02-11 23:03:21,394 - INFO - QuestionGenerator - Generated fill-blank: The life-giving cube that gave birth to the Transformers is known as the _____.
+2026-02-11 23:03:21,396 - INFO - QuestionGenerator - Generating question (attempt 1/3) topic='on transformers movie franchise', difficulty='medium'
+2026-02-11 23:03:22,256 - INFO - httpx - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-11 23:04:06,054 - INFO - QuestionGenerator - Successfully parsed the question
+2026-02-11 23:04:06,054 - INFO - QuestionGenerator - Generated fill-blank: The introduction of the Dinobots takes place in the movie ________.
+2026-02-11 23:06:11,276 - INFO - QuestionGenerator - Generating question (attempt 1/3) topic='on transformers movie franchise', difficulty='medium'
+2026-02-11 23:06:16,633 - INFO - httpx - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-11 23:07:11,046 - INFO - QuestionGenerator - Successfully parsed the question
+2026-02-11 23:07:11,046 - INFO - QuestionGenerator - Generated MCQ: In the 2007 film *Transformers*, which make and model of semi-truck is Optimus Prime's alternate mode?
+2026-02-11 23:07:11,046 - INFO - QuestionGenerator - Generating question (attempt 1/3) topic='on transformers movie franchise', difficulty='medium'
+2026-02-11 23:07:11,687 - INFO - httpx - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-11 23:08:19,905 - INFO - QuestionGenerator - Successfully parsed the question
+2026-02-11 23:08:19,905 - INFO - QuestionGenerator - Generated MCQ: In the movie *Transformers: Dark of the Moon*, which Autobot is tragically killed by Sentinel Prime?
+2026-02-11 23:08:19,905 - INFO - QuestionGenerator - Generating question (attempt 1/3) topic='on transformers movie franchise', difficulty='medium'
+2026-02-11 23:08:20,456 - INFO - httpx - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-11 23:11:31,079 - INFO - QuestionGenerator - Successfully parsed the question
+2026-02-11 23:11:31,079 - INFO - QuestionGenerator - Generated MCQ: In the 2007 live-action film, what is the name of the secret government agency responsible for capturing the Transformers?
+2026-02-11 23:11:31,080 - INFO - QuestionGenerator - Generating question (attempt 1/3) topic='on transformers movie franchise', difficulty='medium'
+2026-02-11 23:11:31,667 - INFO - httpx - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-11 23:13:11,555 - INFO - QuestionGenerator - Successfully parsed the question
+2026-02-11 23:13:11,556 - INFO - QuestionGenerator - Generated MCQ: In *Transformers: Age of Extinction*, what is the name of the Decepticon that takes control of Megatron's body and leads an army of Transformers in the final act?
+2026-02-11 23:13:11,556 - INFO - QuestionGenerator - Generating question (attempt 1/3) topic='on transformers movie franchise', difficulty='medium'
+2026-02-11 23:13:12,148 - INFO - httpx - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"

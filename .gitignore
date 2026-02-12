@@ -1,0 +1,56 @@
+### Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+### Packaging / build artifacts
+build/
+dist/
+*.egg-info/
+*.egg
+MANIFEST
+
+### Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+### Tests / coverage
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+
+### Type checkers / linters / formatters
+.mypy_cache/
+.ruff_cache/
+.pytype/
+
+### Jupyter
+.ipynb_checkpoints/
+
+### IDEs
+.vscode/
+.idea/
+
+### OS (Windows/macOS)
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+### Secrets / local overrides
+.env
+.env.*
+!.env.example
+*.local
+*.local.*
+
+### Personal notes 
+notes.txt
+setup_py_explanation.txt
+uv install libraries industry practice.txt
+uv_after_venv_steps.txt
+logger_and_custom_exception_explanation.txt
