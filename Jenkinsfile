@@ -16,7 +16,7 @@ pipeline {
         KUBE_CREDENTIALS_ID = "kubeconfig"
         KUBE_SERVER_URL = "https://192.168.49.2:8443"
         // Use ArgoCD HTTPS NodePort (see `kubectl -n argocd get svc argocd-server -o yaml`)
-        ARGOCD_SERVER = "136.116.77.133:30675"
+        ARGOCD_SERVER = "192.168.49.2:30675"
         ARGOCD_APP_NAME = "study"
 
         // Ensure kubectl/argocd in workspace are discoverable by plugins/steps.
