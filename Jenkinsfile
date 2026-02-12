@@ -75,7 +75,8 @@ pipeline {
                         git config user.email "jenkins@local"
                         git add manifests/deployment.yaml
                         git commit -m "chore: update image tag to '"${IMAGE_TAG}"'" || echo "No changes to commit"
-                        git push https://$GIT_USER:$GIT_PASS@github.com/deep1305/Study_Buddy_AI.git HEAD:'"${GIT_BRANCH}"'
+                        # Push to a fully-qualified ref (avoid quoting issues)
+                        git push "https://$GIT_USER:$GIT_PASS@github.com/deep1305/Study_Buddy_AI.git" "HEAD:refs/heads/$GIT_BRANCH"
                         '''
                     }
                 }
