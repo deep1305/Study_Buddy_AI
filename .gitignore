@@ -54,3 +54,6 @@ setup_py_explanation.txt
 uv install libraries industry practice.txt
 uv_after_venv_steps.txt
 logger_and_custom_exception_explanation.txt
+
+
+logs/
