@@ -57,3 +57,10 @@ logger_and_custom_exception_explanation.txt
 
 
 logs/
+*.log
+*.log.*
+
+FULL_DOCUMENTATION.md
+~$nkins_Argo_Webhooks_Setup_on_GCP.docx
+~WRL0003.tmp
+Jenkins_Argo_Webhooks_Setup_on_GCP.docx
