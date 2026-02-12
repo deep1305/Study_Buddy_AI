@@ -18,6 +18,10 @@ pipeline {
         // Use ArgoCD HTTPS NodePort (see `kubectl -n argocd get svc argocd-server -o yaml`)
         ARGOCD_SERVER = "136.116.77.133:30675"
         ARGOCD_APP_NAME = "study"
+
+        // Ensure kubectl/argocd in workspace are discoverable by plugins/steps.
+        // (The `kubeconfig {}` wrapper calls `kubectl` during setup.)
+        PATH = "${WORKSPACE}/.bin:${PATH}"
     }
 
     stages {
@@ -89,16 +93,16 @@ pipeline {
                 set -euo pipefail
                 echo "Installing kubectl/argocd locally (no sudo)..."
 
-                mkdir -p ./.bin
+                mkdir -p "$WORKSPACE/.bin"
 
                 if ! command -v kubectl >/dev/null 2>&1; then
-                  curl -sSLo ./.bin/kubectl "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-                  chmod +x ./.bin/kubectl
+                  curl -sSLo "$WORKSPACE/.bin/kubectl" "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+                  chmod +x "$WORKSPACE/.bin/kubectl"
                 fi
 
                 if ! command -v argocd >/dev/null 2>&1; then
-                  curl -sSLo ./.bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
-                  chmod +x ./.bin/argocd
+                  curl -sSLo "$WORKSPACE/.bin/argocd" https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+                  chmod +x "$WORKSPACE/.bin/argocd"
                 fi
                 '''
             }
@@ -111,8 +115,6 @@ pipeline {
                     kubeconfig(credentialsId: "${KUBE_CREDENTIALS_ID}", serverUrl: "${KUBE_SERVER_URL}") {
                         sh '''
                         set -euo pipefail
-                        export PATH="$PWD/.bin:$PATH"
-
                         argocd login "${ARGOCD_SERVER}" --username admin --password "$(kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)" --insecure
                         argocd app sync "${ARGOCD_APP_NAME}"
                         '''
