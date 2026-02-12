@@ -105,7 +105,7 @@ pipeline {
                   chmod +x "$WORKSPACE/.bin/argocd"
                 fi
 
-                "$WORKSPACE/.bin/kubectl" version --client=true --short || true
+                "$WORKSPACE/.bin/kubectl" version --client=true || true
                 "$WORKSPACE/.bin/argocd" version --client || true
                 '''
             }
@@ -122,6 +122,18 @@ pipeline {
 
                         K="$WORKSPACE/.bin/kubectl"
                         A="$WORKSPACE/.bin/argocd"
+
+                        # Validate kubeconfig is a real YAML kubeconfig (avoid confusing errors).
+                        if ! grep -qE '^apiVersion:\\s*v1\\s*$' "$KUBECONFIG"; then
+                          echo "ERROR: Jenkins credential '${KUBE_CREDENTIALS_ID}' is not a valid kubeconfig YAML file."
+                          echo "Fix: In Jenkins -> Credentials, set '${KUBE_CREDENTIALS_ID}' as a *Secret file* and upload your ~/.kube/config (or minikube kubeconfig)."
+                          exit 2
+                        fi
+                        if ! grep -qE '^clusters:\\s*$' "$KUBECONFIG"; then
+                          echo "ERROR: kubeconfig YAML is missing 'clusters:'."
+                          echo "Fix: Re-upload a correct kubeconfig file as the Jenkins credential '${KUBE_CREDENTIALS_ID}'."
+                          exit 2
+                        fi
 
                         "$K" cluster-info
 
