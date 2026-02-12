@@ -95,15 +95,18 @@ pipeline {
 
                 mkdir -p "$WORKSPACE/.bin"
 
-                if ! command -v kubectl >/dev/null 2>&1; then
+                if [ ! -x "$WORKSPACE/.bin/kubectl" ]; then
                   curl -sSLo "$WORKSPACE/.bin/kubectl" "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
                   chmod +x "$WORKSPACE/.bin/kubectl"
                 fi
 
-                if ! command -v argocd >/dev/null 2>&1; then
+                if [ ! -x "$WORKSPACE/.bin/argocd" ]; then
                   curl -sSLo "$WORKSPACE/.bin/argocd" https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
                   chmod +x "$WORKSPACE/.bin/argocd"
                 fi
+
+                "$WORKSPACE/.bin/kubectl" version --client=true --short || true
+                "$WORKSPACE/.bin/argocd" version --client || true
                 '''
             }
         }
@@ -111,12 +114,20 @@ pipeline {
         stage('Sync ArgoCD App') {
             steps {
                 script {
-                    // Your Jenkins has the `kubeconfig {}` step (not `withKubeConfig`).
-                    kubeconfig(credentialsId: "${KUBE_CREDENTIALS_ID}", serverUrl: "${KUBE_SERVER_URL}") {
+                    // Avoid `kubeconfig {}` wrapper (it requires system kubectl).
+                    // Use kubeconfig as a File credential and run our own kubectl binary.
+                    withCredentials([file(credentialsId: "${KUBE_CREDENTIALS_ID}", variable: 'KUBECONFIG')]) {
                         sh '''
                         set -euo pipefail
-                        argocd login "${ARGOCD_SERVER}" --username admin --password "$(kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)" --insecure
-                        argocd app sync "${ARGOCD_APP_NAME}"
+
+                        K="$WORKSPACE/.bin/kubectl"
+                        A="$WORKSPACE/.bin/argocd"
+
+                        "$K" cluster-info
+
+                        ARGO_PWD="$("$K" get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)"
+                        "$A" login "${ARGOCD_SERVER}" --username admin --password "$ARGO_PWD" --insecure
+                        "$A" app sync "${ARGOCD_APP_NAME}"
                         '''
                     }
                 }
