@@ -22,6 +22,12 @@ pipeline {
         // Ensure kubectl/argocd in workspace are discoverable by plugins/steps.
         // (The `kubeconfig {}` wrapper calls `kubectl` during setup.)
         PATH = "${WORKSPACE}/.bin:${PATH}"
+
+        // Prevent webhook build loops:
+        // This pipeline commits `manifests/deployment.yaml` back to GitHub (new image tag).
+        // That push triggers GitHub webhooks again → Jenkins builds again → infinite loop.
+        // We mark auto-commits and skip runs triggered by them.
+        SKIP_PIPELINE = "false"
     }
 
     stages {
@@ -36,7 +42,23 @@ pipeline {
             }
         }
 
+        stage('Detect self-trigger (skip loop)') {
+            steps {
+                script {
+                    def lastSubject = sh(returnStdout: true, script: 'git log -1 --pretty=%s').trim()
+
+                    // Skip builds caused by Jenkins' own "update image tag" commit.
+                    if (lastSubject.contains('[jenkins-auto]') || lastSubject.startsWith('chore: update image tag')) {
+                        env.SKIP_PIPELINE = "true"
+                        currentBuild.description = "Skipped self-triggered commit: ${lastSubject}"
+                        echo "Skipping pipeline because last commit is a Jenkins auto-commit: ${lastSubject}"
+                    }
+                }
+            }
+        }
+
         stage('Build Docker Image') {
+            when { expression { return env.SKIP_PIPELINE != "true" } }
             steps {
                 script {
                     echo 'Building Docker image...'
@@ -47,6 +69,7 @@ pipeline {
         }
 
         stage('Push Image to DockerHub') {
+            when { expression { return env.SKIP_PIPELINE != "true" } }
             steps {
                 script {
                     echo 'Pushing Docker image to DockerHub...'
@@ -59,6 +82,7 @@ pipeline {
         }
 
         stage('Update Deployment YAML with New Tag') {
+            when { expression { return env.SKIP_PIPELINE != "true" } }
             steps {
                 sh """
                 set -euo pipefail
@@ -68,6 +92,7 @@ pipeline {
         }
 
         stage('Commit Updated YAML') {
+            when { expression { return env.SKIP_PIPELINE != "true" } }
             steps {
                 script {
                     // Expect "Username with password" where password is a GitHub PAT
@@ -78,7 +103,7 @@ pipeline {
                         git config user.name "jenkins"
                         git config user.email "jenkins@local"
                         git add manifests/deployment.yaml
-                        git commit -m "chore: update image tag to '"${IMAGE_TAG}"'" || echo "No changes to commit"
+                        git commit -m "chore: update image tag to '"${IMAGE_TAG}"' [jenkins-auto]" || echo "No changes to commit"
                         # Push to a fully-qualified ref (avoid quoting issues)
                         git push "https://$GIT_USER:$GIT_PASS@github.com/deep1305/Study_Buddy_AI.git" "HEAD:refs/heads/$GIT_BRANCH"
                         '''
@@ -88,6 +113,7 @@ pipeline {
         }
 
         stage('Install kubectl & ArgoCD CLI (if missing)') {
+            when { expression { return env.SKIP_PIPELINE != "true" } }
             steps {
                 sh '''
                 set -euo pipefail
@@ -112,6 +138,7 @@ pipeline {
         }
 
         stage('Sync ArgoCD App') {
+            when { expression { return env.SKIP_PIPELINE != "true" } }
             steps {
                 script {
                     // Avoid `kubeconfig {}` wrapper (it requires system kubectl).
