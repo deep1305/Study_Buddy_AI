@@ -64,11 +64,7 @@ The app reads settings from environment variables (optionally from a local `.env
 
 - `USE_OLLAMA`: `"true"` or `"false"`
 - `GROQ_API_KEY`: required when `USE_OLLAMA=false`
-- `GROQ_MODEL`: default `"llama-3.3-70b-versatile"`
-- `OLLAMA_MODEL`: default `"glm-4.7-flash:q4_K_M"`
 - `OLLAMA_BASE_URL`: default `"http://localhost:11434"`
-- `TEMPERATURE`: default `0.9`
-- `MAX_RETRIES`: default `3`
 
 ## 🚀 Getting Started (Local Dev)
 
@@ -118,9 +114,9 @@ docker build -t study-buddy-ai:latest .
 ### Run (Groq mode)
 
 ```bash
-docker run --rm -p 8501:8501 ^
-  -e USE_OLLAMA=false ^
-  -e GROQ_API_KEY=YOUR_GROQ_API_KEY ^
+docker run --rm -p 8501:8501 \
+  -e USE_OLLAMA=false \
+  -e GROQ_API_KEY=YOUR_GROQ_API_KEY \
   study-buddy-ai:latest
 ```
 
@@ -130,9 +126,9 @@ If your Ollama server is running on your machine, the container must be able to 
 On Windows/Mac, you typically set `OLLAMA_BASE_URL` to the host address reachable from Docker.
 
 ```bash
-docker run --rm -p 8501:8501 ^
-  -e USE_OLLAMA=true ^
-  -e OLLAMA_BASE_URL=http://host.docker.internal:11434 ^
+docker run --rm -p 8501:8501 \
+  -e USE_OLLAMA=true \
+  -e OLLAMA_BASE_URL=http://host.docker.internal:11434 \
   study-buddy-ai:latest
 ```
 
@@ -171,6 +167,40 @@ kubectl get svc llmops-service
 ```
 
 Then open `http://<NODE_IP>:<NODE_PORT>`.
+
+## 🔄 CI/CD (Jenkins + Argo CD)
+
+This repo includes a `Jenkinsfile` that implements a simple GitOps-style flow:
+
+- **Jenkins**:
+  - checks out `main`
+  - builds + pushes a Docker image to Docker Hub (`dataguru97/studybuddy:v<BUILD_NUMBER>`)
+  - updates `manifests/deployment.yaml` with the new image tag
+  - commits + pushes the manifest change back to `main`
+  - logs into **Argo CD** and triggers `argocd app sync`
+
+- **Argo CD**:
+  - watches the repo/manifests and applies the updated image tag to the cluster
+
+### Jenkins credentials required
+
+Create these credentials in Jenkins (IDs must match):
+
+- `github-token` (**Username with password**)
+  - username: your GitHub username
+  - password: a GitHub **PAT** with repo write permission
+- `dockerhub-token` (Docker Hub credentials/token)
+- `kubeconfig` (Kubeconfig credential for your cluster)
+
+### Jenkinsfile environment values to verify
+
+At the top of `Jenkinsfile`, confirm these match your environment:
+
+- `GIT_REPO_URL` (this repo)
+- `GIT_BRANCH` (usually `main`)
+- `KUBE_SERVER_URL` (Kubernetes API server URL)
+- `ARGOCD_SERVER` (Argo CD server address)
+- `ARGOCD_APP_NAME` (your Argo CD application name; currently `study`)
 
 ## 🔁 Dependency Management (important)
 

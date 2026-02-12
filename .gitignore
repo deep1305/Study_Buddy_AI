@@ -60,6 +60,14 @@ logs/
 *.log
 *.log.*
 
+### Downloaded CLIs / checksums (do not commit)
+kubectl
+kubectl.exe
+kubectl.sha256
+argocd
+argocd.exe
+*.sha256
+
 FULL_DOCUMENTATION.md
 ~$nkins_Argo_Webhooks_Setup_on_GCP.docx
 ~WRL0003.tmp
