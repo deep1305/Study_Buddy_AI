@@ -15,7 +15,8 @@ pipeline {
         // Kubernetes / ArgoCD (adjust as needed)
         KUBE_CREDENTIALS_ID = "kubeconfig"
         KUBE_SERVER_URL = "https://192.168.49.2:8443"
-        ARGOCD_SERVER = "136.116.77.133:31704/"
+        // Use ArgoCD HTTPS NodePort (see `kubectl -n argocd get svc argocd-server -o yaml`)
+        ARGOCD_SERVER = "136.116.77.133:30675"
         ARGOCD_APP_NAME = "study"
     }
 
@@ -35,7 +36,8 @@ pipeline {
             steps {
                 script {
                     echo 'Building Docker image...'
-                    dockerImage = docker.build("${DOCKER_HUB_REPO}:${IMAGE_TAG}")
+                    def imageRef = "${DOCKER_HUB_REPO}:${IMAGE_TAG}"
+                    docker.build(imageRef)
                 }
             }
         }
@@ -46,7 +48,7 @@ pipeline {
                     echo 'Pushing Docker image to DockerHub...'
                     // DockerHub registry endpoint for docker.withRegistry
                     docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_HUB_CREDENTIALS_ID}") {
-                        dockerImage.push("${IMAGE_TAG}")
+                        docker.image("${DOCKER_HUB_REPO}:${IMAGE_TAG}").push()
                     }
                 }
             }
@@ -66,14 +68,15 @@ pipeline {
                 script {
                     // Expect "Username with password" where password is a GitHub PAT
                     withCredentials([usernamePassword(credentialsId: "${GITHUB_CREDENTIALS_ID}", usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
-                        sh """
+                        // Avoid Groovy interpolating secrets by using a single-quoted shell block.
+                        sh '''
                         set -euo pipefail
                         git config user.name "jenkins"
                         git config user.email "jenkins@local"
                         git add manifests/deployment.yaml
-                        git commit -m "chore: update image tag to ${IMAGE_TAG}" || echo "No changes to commit"
-                        git push https://${GIT_USER}:${GIT_PASS}@github.com/deep1305/Study_Buddy_AI.git HEAD:${GIT_BRANCH}
-                        """
+                        git commit -m "chore: update image tag to '"${IMAGE_TAG}"'" || echo "No changes to commit"
+                        git push https://$GIT_USER:$GIT_PASS@github.com/deep1305/Study_Buddy_AI.git HEAD:'"${GIT_BRANCH}"'
+                        '''
                     }
                 }
             }
@@ -103,8 +106,8 @@ pipeline {
         stage('Sync ArgoCD App') {
             steps {
                 script {
-                    // Requires Jenkins Kubernetes CLI plugin (withKubeConfig step)
-                    withKubeConfig(credentialsId: "${KUBE_CREDENTIALS_ID}", serverUrl: "${KUBE_SERVER_URL}") {
+                    // Your Jenkins has the `kubeconfig {}` step (not `withKubeConfig`).
+                    kubeconfig(credentialsId: "${KUBE_CREDENTIALS_ID}", serverUrl: "${KUBE_SERVER_URL}") {
                         sh '''
                         set -euo pipefail
                         export PATH="$PWD/.bin:$PATH"
