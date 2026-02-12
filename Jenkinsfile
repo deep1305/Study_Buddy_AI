@@ -1,6 +1,12 @@
 pipeline {
     agent any
 
+    options {
+        // Prevent multiple overlapping runs (which can create multiple image-tag commits quickly).
+        // This is especially helpful when GitHub webhooks fire several times close together.
+        disableConcurrentBuilds()
+    }
+
     environment {
         // Git (align with your actual repo)
         GIT_REPO_URL = "https://github.com/deep1305/Study_Buddy_AI.git"
