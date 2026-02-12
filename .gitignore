@@ -68,6 +68,10 @@ argocd
 argocd.exe
 *.sha256
 
+### Local kubeconfig exports / temp files
+kubeconfig-ci.yaml
+~WRL*.tmp
+
 FULL_DOCUMENTATION.md
 ~$nkins_Argo_Webhooks_Setup_on_GCP.docx
 ~WRL0003.tmp
